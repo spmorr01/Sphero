@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.orbotix.ConvenienceRobot;
 import com.orbotix.DualStackDiscoveryAgent;
@@ -19,22 +20,39 @@ import com.orbotix.le.RobotLE;
 
 public class HomeScreen extends AppCompatActivity {
 
+    TextView connectTextBox;
     private ConvenienceRobot mRobot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
+        connectTextBox = (TextView)findViewById(R.id.connectTextView);
 
         DualStackDiscoveryAgent.getInstance().addRobotStateListener(new RobotChangedStateListener() {
             @Override
             public void handleRobotChangedState(Robot robot, RobotChangedStateNotificationType type) {
                 switch (type) {
+                    case Offline:
+                        break;
+                    case Connecting:
+                        break;
+                    case Connected:
+                        connectTextBox.setText("Connected!");
+                        break;
                     case Online:
+                        DualStackDiscoveryAgent.getInstance().stopDiscovery();
                         if (robot instanceof RobotClassic) {
                             mRobot = new Sphero(robot);
+                            mRobot.setZeroHeading();
                             mRobot.sendCommand( new RGBLEDOutputCommand( 0.5f, 0.5f, 0.5f ) );
                             mRobot.sendCommand( new RollCommand( 90f, .5f, RollCommand.State.GO ) );
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            mRobot.sendCommand(new RollCommand(0f, 0.0f, RollCommand.State.STOP));
                         }
                         if (robot instanceof RobotLE) {
                             mRobot = new Ollie(robot);
@@ -42,6 +60,8 @@ public class HomeScreen extends AppCompatActivity {
 
                         break;
                     case Disconnected:
+                        break;
+                    case FailedConnect:
                         break;
                 }
             }
