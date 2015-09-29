@@ -1,5 +1,6 @@
 package com.willydevelopment.jj.sphero;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -14,6 +15,7 @@ import com.orbotix.classic.RobotClassic;
 import com.orbotix.command.RGBLEDOutputCommand;
 import com.orbotix.command.RollCommand;
 import com.orbotix.common.DiscoveryException;
+import com.orbotix.common.ResponseListener;
 import com.orbotix.common.Robot;
 import com.orbotix.common.RobotChangedStateListener;
 import com.orbotix.le.RobotLE;
@@ -21,7 +23,7 @@ import com.orbotix.le.RobotLE;
 public class HomeScreen extends AppCompatActivity {
 
     TextView connectTextBox;
-    private ConvenienceRobot mRobot;
+    public static ConvenienceRobot mRobot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,19 +47,12 @@ public class HomeScreen extends AppCompatActivity {
                         if (robot instanceof RobotClassic) {
                             mRobot = new Sphero(robot);
                             mRobot.setZeroHeading();
-                            mRobot.sendCommand( new RGBLEDOutputCommand( 0.5f, 0.5f, 0.5f ) );
-                            mRobot.sendCommand( new RollCommand( 90f, .5f, RollCommand.State.GO ) );
-                            try {
-                                Thread.sleep(2000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            mRobot.sendCommand(new RollCommand(0f, 0.0f, RollCommand.State.STOP));
+
                         }
                         if (robot instanceof RobotLE) {
                             mRobot = new Ollie(robot);
                         }
-
+                        startActivity();
                         break;
                     case Disconnected:
                         break;
@@ -66,9 +61,19 @@ public class HomeScreen extends AppCompatActivity {
                 }
             }
         });
+
     }
 
-
+    public void startActivity()
+    {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Intent ButtonActivities = new Intent(this, ButtonActivities.class);
+        startActivity(ButtonActivities);
+    }
 
 
     @Override
@@ -82,12 +87,7 @@ public class HomeScreen extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStop() {
-        if( mRobot != null )
-            mRobot.disconnect();
-        super.onStop();
-    }
+
 
 
 
