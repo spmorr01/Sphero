@@ -16,6 +16,8 @@ import com.orbotix.common.internal.DeviceResponse;
 
 public class ButtonActivities extends AppCompatActivity {
 
+    public int collision;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,8 +111,13 @@ public class ButtonActivities extends AppCompatActivity {
 
     public void onAutoDriveButtonClicked (View view)
     {
-        HomeScreen.mRobot.enableCollisions( true );
-        HomeScreen.mRobot.sendCommand(new RollCommand(0f, .5f, RollCommand.State.GO));
+        HomeScreen.mRobot.enableCollisions(true);
+
+        collision = 0;
+        HomeScreen.mRobot.setZeroHeading();
+        HomeScreen.mRobot.drive(0f, 0.51f);
+
+
         HomeScreen.mRobot.addResponseListener(new ResponseListener() {
             @Override
             public void handleResponse(DeviceResponse deviceResponse, Robot robot) {
@@ -124,10 +131,18 @@ public class ButtonActivities extends AppCompatActivity {
 
             @Override
             public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
-                if( asyncMessage instanceof CollisionDetectedAsyncData) {
+                if (asyncMessage instanceof CollisionDetectedAsyncData) {
                     //Collision occurred.
-                    HomeScreen.mRobot.setZeroHeading();
-                    HomeScreen.mRobot.sendCommand(new RollCommand(180f, .5f, RollCommand.State.GO));
+                    collision = 1;
+                    do {
+                        HomeScreen.mRobot.drive(0f, 0.0f);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        HomeScreen.mRobot.drive(180f, 1f);
+                    } while (collision == 1);
                 }
             }
         });
