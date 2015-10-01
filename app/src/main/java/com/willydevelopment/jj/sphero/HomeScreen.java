@@ -12,15 +12,12 @@ import com.orbotix.DualStackDiscoveryAgent;
 import com.orbotix.Ollie;
 import com.orbotix.Sphero;
 import com.orbotix.classic.RobotClassic;
-import com.orbotix.command.RGBLEDOutputCommand;
-import com.orbotix.command.RollCommand;
 import com.orbotix.common.DiscoveryException;
-import com.orbotix.common.ResponseListener;
 import com.orbotix.common.Robot;
 import com.orbotix.common.RobotChangedStateListener;
 import com.orbotix.le.RobotLE;
 
-public class HomeScreen extends AppCompatActivity {
+public class HomeScreen extends AppCompatActivity implements RobotChangedStateListener {
 
     TextView connectTextBox;
     public static ConvenienceRobot mRobot;
@@ -30,37 +27,8 @@ public class HomeScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
         connectTextBox = (TextView)findViewById(R.id.connectTextView);
+        DualStackDiscoveryAgent.getInstance().addRobotStateListener( this );
 
-        DualStackDiscoveryAgent.getInstance().addRobotStateListener(new RobotChangedStateListener() {
-            @Override
-            public void handleRobotChangedState(Robot robot, RobotChangedStateNotificationType type) {
-                switch (type) {
-                    case Offline:
-                        break;
-                    case Connecting:
-                        break;
-                    case Connected:
-                        connectTextBox.setText("Connected!");
-                        break;
-                    case Online:
-                        DualStackDiscoveryAgent.getInstance().stopDiscovery();
-                        if (robot instanceof RobotClassic) {
-                            mRobot = new Sphero(robot);
-                            mRobot.setZeroHeading();
-
-                        }
-                        if (robot instanceof RobotLE) {
-                            mRobot = new Ollie(robot);
-                        }
-                        startActivity();
-                        break;
-                    case Disconnected:
-                        break;
-                    case FailedConnect:
-                        break;
-                }
-            }
-        });
 
     }
 
@@ -84,6 +52,36 @@ public class HomeScreen extends AppCompatActivity {
             DualStackDiscoveryAgent.getInstance().startDiscovery(this);
         } catch( DiscoveryException e ) {
             //handle exception
+        }
+    }
+
+    @Override
+    public void handleRobotChangedState(Robot robot, RobotChangedStateListener.RobotChangedStateNotificationType type) {
+        switch (type) {
+            case Offline:
+                break;
+            case Connecting:
+                break;
+            case Connected:
+                connectTextBox.setText("Connected!");
+                break;
+            case Online:
+                DualStackDiscoveryAgent.getInstance().stopDiscovery();
+                if (robot instanceof RobotClassic) {
+                    mRobot = new Sphero(robot);
+                    mRobot.setZeroHeading();
+
+                }
+                if (robot instanceof RobotLE) {
+                    mRobot = new Ollie(robot);
+                    mRobot.setZeroHeading();
+                }
+                startActivity();
+                break;
+            case Disconnected:
+                break;
+            case FailedConnect:
+                break;
         }
     }
 

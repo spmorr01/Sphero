@@ -1,18 +1,12 @@
 package com.willydevelopment.jj.sphero;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.orbotix.async.CollisionDetectedAsyncData;
 import com.orbotix.command.RGBLEDOutputCommand;
-import com.orbotix.command.RollCommand;
-import com.orbotix.common.ResponseListener;
-import com.orbotix.common.Robot;
-import com.orbotix.common.internal.AsyncMessage;
-import com.orbotix.common.internal.DeviceResponse;
 
 public class ButtonActivities extends AppCompatActivity {
 
@@ -26,19 +20,20 @@ public class ButtonActivities extends AppCompatActivity {
 
     public void onTestDriveForwardButtonClicked(View view)
     {
-        HomeScreen.mRobot.setZeroHeading();
         HomeScreen.mRobot.sendCommand( new RGBLEDOutputCommand( 0.5f, 0.5f, 0.5f ) );
-        //HomeScreen.mRobot.sendCommand(new RollCommand(0f, 1f, RollCommand.State.GO));
-        HomeScreen.mRobot.drive( 0f, .5f );
-        /*try {
-            Thread.sleep(2000);
+        do {
+            collision = 1;
+            HomeScreen.mRobot.drive(0f, .3f);
+        } while (collision == 1);
+        try {
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        HomeScreen.mRobot.sendCommand(new RollCommand(0f, 0.0f, RollCommand.State.STOP));*/
+        collision = 0;
     }
 
-    public void onTestDriveBackwardsButtonClicked(View view)
+    /*public void onTestDriveBackwardsButtonClicked(View view)
     {
         HomeScreen.mRobot.setZeroHeading();
         HomeScreen.mRobot.sendCommand( new RGBLEDOutputCommand( 0.5f, 0.5f, 0.5f ) );
