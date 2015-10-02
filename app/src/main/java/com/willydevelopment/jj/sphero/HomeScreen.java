@@ -15,7 +15,9 @@ import com.orbotix.classic.RobotClassic;
 import com.orbotix.common.DiscoveryException;
 import com.orbotix.common.Robot;
 import com.orbotix.common.RobotChangedStateListener;
+import com.orbotix.common.sensor.SensorFlag;
 import com.orbotix.le.RobotLE;
+import com.orbotix.subsystem.SensorControl;
 
 public class HomeScreen extends AppCompatActivity implements RobotChangedStateListener {
 
@@ -27,7 +29,6 @@ public class HomeScreen extends AppCompatActivity implements RobotChangedStateLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
         connectTextBox = (TextView)findViewById(R.id.connectTextView);
-        DualStackDiscoveryAgent.getInstance().addRobotStateListener( this );
 
 
     }
@@ -66,15 +67,21 @@ public class HomeScreen extends AppCompatActivity implements RobotChangedStateLi
                 connectTextBox.setText("Connected!");
                 break;
             case Online:
+                long sensorFlag = SensorFlag.VELOCITY.longValue() | SensorFlag.LOCATOR.longValue();
                 DualStackDiscoveryAgent.getInstance().stopDiscovery();
                 if (robot instanceof RobotClassic) {
                     mRobot = new Sphero(robot);
                     mRobot.setZeroHeading();
+                    mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE10);
+                    DualStackDiscoveryAgent.getInstance().addRobotStateListener(this);
+
 
                 }
                 if (robot instanceof RobotLE) {
                     mRobot = new Ollie(robot);
                     mRobot.setZeroHeading();
+                    mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE10);
+                    DualStackDiscoveryAgent.getInstance().addRobotStateListener(this);
                 }
                 startActivity();
                 break;

@@ -17,6 +17,32 @@
         android:id="@+id/ButtonActivityTable"
         android:layout_centerInParent="true">
         <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/positionXRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Position X"
+            android:id="@+id/positionXTextView"
+            android:gravity="center" />
+    </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/positionYRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Position Y"
+                android:id="@+id/positionYTextView"
+                android:gravity="center" />
+        </LinearLayout>
+        <LinearLayout
             android:orientation="horizontal"
             android:id="@+id/headerTableRow"
             android:layout_width="wrap_content"
