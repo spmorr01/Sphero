@@ -1,48 +1,61 @@
 package com.willydevelopment.jj.sphero;
 
-import android.content.Intent;
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.orbotix.ConvenienceRobot;
 import com.orbotix.DualStackDiscoveryAgent;
-import com.orbotix.Ollie;
-import com.orbotix.Sphero;
-import com.orbotix.classic.RobotClassic;
+import com.orbotix.async.DeviceSensorAsyncMessage;
 import com.orbotix.common.DiscoveryException;
+import com.orbotix.common.ResponseListener;
 import com.orbotix.common.Robot;
 import com.orbotix.common.RobotChangedStateListener;
+import com.orbotix.common.internal.AsyncMessage;
+import com.orbotix.common.internal.DeviceResponse;
 import com.orbotix.common.sensor.SensorFlag;
-import com.orbotix.le.RobotLE;
 import com.orbotix.subsystem.SensorControl;
 
-public class HomeScreen extends AppCompatActivity implements RobotChangedStateListener {
+/**
+ * Locator sample
+ *
+ * Keeps track of the robot's position by recording direction and speed.
+ * This sample demonstrates how to use the Locator and Velocity sensors.
+ *
+ * For more explaination on driving, see the Button Drive sample
+ *
+ */
+public class HomeScreen extends Activity implements RobotChangedStateListener, ResponseListener {
+
+    private static final float ROBOT_VELOCITY = 0.2f;
+
+    private ConvenienceRobot mRobot;
+    public float positionAtX;
 
     TextView connectTextBox;
-    public static ConvenienceRobot mRobot;
+    TextView positionXTextView;
+    TextView positionYTextView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_screen);
+        setContentView( R.layout.activity_home_screen );
         connectTextBox = (TextView)findViewById(R.id.connectTextView);
+        positionXTextView = (TextView)findViewById(R.id.positionXTextView);
+        positionYTextView = (TextView)findViewById(R.id.positionYTextView);
 
+        /*
+            Associate a listener for robot state changes with the DualStackDiscoveryAgent.
+            DualStackDiscoveryAgent checks for both Bluetooth Classic and Bluetooth LE.
+            DiscoveryAgentClassic checks only for Bluetooth Classic robots.
+            DiscoveryAgentLE checks only for Bluetooth LE robots.
+       */
+        DualStackDiscoveryAgent.getInstance().addRobotStateListener(this);
 
     }
 
-    public void startActivity()
-    {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Intent ButtonActivities = new Intent(this, ButtonActivities.class);
-        startActivity(ButtonActivities);
-    }
 
 
     @Override
@@ -57,66 +70,115 @@ public class HomeScreen extends AppCompatActivity implements RobotChangedStateLi
     }
 
     @Override
-    public void handleRobotChangedState(Robot robot, RobotChangedStateListener.RobotChangedStateNotificationType type) {
+    protected void onStop() {
+        if( mRobot != null )
+            mRobot.disconnect();
+        super.onStop();
+    }
+
+    /*@Override
+    protected void onStop() {
+        //If the DiscoveryAgent is in discovery mode, stop it.
+        if( DualStackDiscoveryAgent.getInstance().isDiscovering() ) {
+            DualStackDiscoveryAgent.getInstance().stopDiscovery();
+        }
+
+        //If a robot is connected to the device, disconnect it
+        if( mRobot != null ) {
+            mRobot.disconnect();
+            mRobot = null;
+        }
+
+        super.onStop();
+    }*/
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        DualStackDiscoveryAgent.getInstance().addRobotStateListener(null);
+    }
+
+    public void onTestDriveForwardButtonClicked (View v) {
+        do {
+            mRobot.drive(0.0f, ROBOT_VELOCITY);
+       } while (positionAtX <= 2);
+        mRobot.stop();
+        positionXTextView.setText("FINISHED!");
+    }
+
+
+    //Set the displayed location to user determined values
+    /*private void configureLocator() {
+        if( mRobot == null )
+            return;
+
+        int newX = 0;
+        int newY = 0;
+        int newYaw = 0;
+
+        try {
+            newX = Integer.parseInt( mEditTextNewX.getText().toString() );
+        } catch( NumberFormatException e ) {}
+
+        try {
+            newY = Integer.parseInt( mEditTextNewY.getText().toString() );
+        } catch( NumberFormatException e ) {}
+
+        try {
+            newYaw = Integer.parseInt( mEditTextNewYaw.getText().toString() );
+        } catch( NumberFormatException e ) {}
+
+        int flag = mCheckboxFlag.isChecked() ?
+                ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_ON
+                : ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_OFF;
+
+        mRobot.sendCommand( new ConfigureLocatorCommand( flag, newX, newY, newYaw ) );
+    }*/
+
+    @Override
+    public void handleResponse(DeviceResponse response, Robot robot) {
+    }
+
+    @Override
+    public void handleStringResponse(String stringResponse, Robot robot) {
+    }
+
+    @Override
+    public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
+        if( asyncMessage instanceof DeviceSensorAsyncMessage ) {
+            float positionX = ( (DeviceSensorAsyncMessage) asyncMessage ).getAsyncData().get( 0 ).getLocatorData().getPositionX();
+            positionAtX += positionX;
+            float positionY = ( (DeviceSensorAsyncMessage) asyncMessage ).getAsyncData().get( 0 ).getLocatorData().getPositionY();
+            float velocityX = ( (DeviceSensorAsyncMessage) asyncMessage ).getAsyncData().get( 0 ).getLocatorData().getVelocity().x;
+            float velocityY = ( (DeviceSensorAsyncMessage) asyncMessage ).getAsyncData().get( 0 ).getLocatorData().getVelocity().y;
+
+            positionXTextView.setText(positionX + "cm");
+            //mTextViewLocatorY.setText( positionY + "cm" );
+            //mTextViewLocatorVX.setText( velocityX + "cm/s" );
+            //mTextViewLocatorVY.setText( velocityY + "cm/s" );
+        }
+    }
+
+    @Override
+    public void handleRobotChangedState(Robot robot, RobotChangedStateNotificationType type) {
         switch (type) {
-            case Offline:
-                break;
-            case Connecting:
-                break;
-            case Connected:
-                connectTextBox.setText("Connected!");
-                break;
-            case Online:
-                long sensorFlag = SensorFlag.VELOCITY.longValue() | SensorFlag.LOCATOR.longValue();
+            case Online: {
                 DualStackDiscoveryAgent.getInstance().stopDiscovery();
-                if (robot instanceof RobotClassic) {
-                    mRobot = new Sphero(robot);
-                    mRobot.setZeroHeading();
-                    mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE10);
-                    DualStackDiscoveryAgent.getInstance().addRobotStateListener(this);
 
+                connectTextBox.setText("Connected!");
+                //Sensor flags can be bitwise ORed together to enable multiple sensors
+                long sensorFlag = SensorFlag.VELOCITY.longValue() | SensorFlag.LOCATOR.longValue();
 
-                }
-                if (robot instanceof RobotLE) {
-                    mRobot = new Ollie(robot);
-                    mRobot.setZeroHeading();
-                    mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE10);
-                    DualStackDiscoveryAgent.getInstance().addRobotStateListener(this);
-                }
-                startActivity();
+                //Save the robot as a ConvenienceRobot for additional utility methods
+                mRobot = new ConvenienceRobot(robot);
+
+                //Enable sensors based on earlier defined flags, and set the streaming rate.
+                //This example streams data from the connected robot 10 times a second.
+                mRobot.enableSensors( sensorFlag, SensorControl.StreamingRate.STREAMING_RATE100 );
+                mRobot.addResponseListener( this );
+
                 break;
-            case Disconnected:
-                break;
-            case FailedConnect:
-                break;
+            }
         }
-    }
-
-
-
-
-
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home_screen, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

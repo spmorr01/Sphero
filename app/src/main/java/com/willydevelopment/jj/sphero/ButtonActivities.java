@@ -4,11 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.orbotix.async.DeviceSensorAsyncMessage;
-import com.orbotix.command.RGBLEDOutputCommand;
 import com.orbotix.common.ResponseListener;
 import com.orbotix.common.Robot;
 import com.orbotix.common.internal.AsyncMessage;
@@ -31,11 +29,11 @@ public class ButtonActivities extends AppCompatActivity implements ResponseListe
 
     }
 
-    public void onTestDriveForwardButtonClicked(View view)
+    /*public void onTestDriveForwardButtonClicked(View view)
     {
         HomeScreen.mRobot.sendCommand( new RGBLEDOutputCommand( 0.5f, 0.5f, 0.5f ) );
         HomeScreen.mRobot.drive(0f, .3f);
-    }
+    }*/
 
     /*public void onTestDriveBackwardsButtonClicked(View view)
     {

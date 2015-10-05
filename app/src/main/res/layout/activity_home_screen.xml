@@ -18,6 +18,108 @@
         android:layout_centerInParent="true">
         <LinearLayout
             android:orientation="horizontal"
+            android:id="@+id/positionXRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Position X"
+                android:id="@+id/positionXTextView"
+                android:gravity="center" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/positionYRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Position Y"
+                android:id="@+id/positionYTextView"
+                android:gravity="center" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/TestDriveRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <Button
+                android:id="@+id/TestDriveForwardButton"
+                android:layout_width="125dp"
+                android:layout_height="75dp"
+                android:background="#ffffff"
+                android:textSize="18sp"
+                android:text="Test Drive Forward"
+                android:textColor="#000000"
+                android:clickable="true"
+                android:layout_gravity="center"
+                android:onClick="onTestDriveForwardButtonClicked">
+            </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/backwardsButtonRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <Button
+                android:id="@+id/TestDriveBackwardsButton"
+                android:layout_width="125dp"
+                android:layout_height="75dp"
+                android:background="#ffffff"
+                android:textSize="18sp"
+                android:text="Test Drive Backwards"
+                android:textColor="#000000"
+                android:clickable="true"
+                android:layout_gravity="center"
+                android:onClick="onTestDriveBackwardsButtonClicked">
+            </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/SquareDriveButtonRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <Button
+                android:id="@+id/SquareDriveButton"
+                android:layout_width="125dp"
+                android:layout_height="75dp"
+                android:background="#ffffff"
+                android:textSize="18sp"
+                android:text="Square"
+                android:textColor="#000000"
+                android:clickable="true"
+                android:layout_gravity="center"
+                android:onClick="onSquareDriveButtonClicked">
+            </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/AutoDriveButtonRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <Button
+                android:id="@+id/AutoDriveButton"
+                android:layout_width="125dp"
+                android:layout_height="75dp"
+                android:background="#ffffff"
+                android:textSize="18sp"
+                android:text="Auto Drive"
+                android:textColor="#000000"
+                android:clickable="true"
+                android:layout_gravity="center"
+                android:onClick="onAutoDriveButtonClicked">
+            </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:id="@+id/headerTableRow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
