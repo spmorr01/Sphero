@@ -1,12 +1,15 @@
 package com.willydevelopment.jj.sphero;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.orbotix.ConvenienceRobot;
 import com.orbotix.DualStackDiscoveryAgent;
+import com.orbotix.async.CollisionDetectedAsyncData;
 import com.orbotix.async.DeviceSensorAsyncMessage;
 import com.orbotix.common.DiscoveryException;
 import com.orbotix.common.ResponseListener;
@@ -23,28 +26,34 @@ import com.orbotix.subsystem.SensorControl;
  * Keeps track of the robot's position by recording direction and speed.
  * This sample demonstrates how to use the Locator and Velocity sensors.
  *
- * For more explaination on driving, see the Button Drive sample
+ * For more explanation on driving, see the Button Drive sample
  *
  */
-public class HomeScreen extends Activity implements RobotChangedStateListener, ResponseListener {
+public class HomeScreen extends Activity implements RobotChangedStateListener {
 
-    private static final float ROBOT_VELOCITY = 0.2f;
+    private static final float ROBOT_VELOCITY = 0.4f;
 
     private ConvenienceRobot mRobot;
-    public float positionAtX;
+    public float positionAtY;
+    public boolean reachedDistance;
+    public float driveVariable;
 
     TextView connectTextBox;
-    TextView positionXTextView;
+    TextView statusTextView;
     TextView positionYTextView;
+    Button testDriveForwardButton;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView( R.layout.activity_home_screen );
+        setContentView(R.layout.activity_home_screen);
         connectTextBox = (TextView)findViewById(R.id.connectTextView);
-        positionXTextView = (TextView)findViewById(R.id.positionXTextView);
+        statusTextView = (TextView)findViewById(R.id.statusTextView);
         positionYTextView = (TextView)findViewById(R.id.positionYTextView);
+        testDriveForwardButton = (Button)findViewById(R.id.TestDriveForwardButton);
+        testDriveForwardButton.setEnabled(false);
+
 
         /*
             Associate a listener for robot state changes with the DualStackDiscoveryAgent.
@@ -69,14 +78,14 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
         }
     }
 
-    @Override
+    /*@Override
     protected void onStop() {
         if( mRobot != null )
             mRobot.disconnect();
         super.onStop();
-    }
+    }*/
 
-    /*@Override
+    @Override
     protected void onStop() {
         //If the DiscoveryAgent is in discovery mode, stop it.
         if( DualStackDiscoveryAgent.getInstance().isDiscovering() ) {
@@ -90,7 +99,7 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
         }
 
         super.onStop();
-    }*/
+    }
 
     @Override
     protected void onDestroy() {
@@ -99,64 +108,82 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
     }
 
     public void onTestDriveForwardButtonClicked (View v) {
-        do {
-            mRobot.drive(0.0f, ROBOT_VELOCITY);
-       } while (positionAtX <= 2);
-        mRobot.stop();
-        positionXTextView.setText("FINISHED!");
+        statusTextView.setText("Rolling...");
+        mRobot.drive(0f, ROBOT_VELOCITY);
+
+        mRobot.addResponseListener(new ResponseListener() {
+            @Override
+            public void handleResponse(DeviceResponse response, Robot robot) {
+            }
+
+            @Override
+            public void handleStringResponse(String stringResponse, Robot robot) {
+            }
+
+            @Override
+            public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
+                if (asyncMessage instanceof DeviceSensorAsyncMessage) {
+                    float positionY = ((DeviceSensorAsyncMessage) asyncMessage).getAsyncData().get(0).getLocatorData().getPositionY();
+                    positionYTextView.setText(positionY + "cm");
+
+                    if (positionY == 300) {
+                        mRobot.stop();
+                        testDriveForwardButton.setEnabled(false);
+                        statusTextView.setText("FINISHED!");
+                    }
+                }
+            }
+        });
     }
 
+    public void onAutoDriveButtonClicked (View view)
+    {
+        mRobot.enableCollisions(true);
+        mRobot.drive(0f, ROBOT_VELOCITY);
 
-    //Set the displayed location to user determined values
-    /*private void configureLocator() {
-        if( mRobot == null )
-            return;
 
-        int newX = 0;
-        int newY = 0;
-        int newYaw = 0;
+        mRobot.addResponseListener(new ResponseListener() {
+            @Override
+            public void handleResponse(DeviceResponse deviceResponse, Robot robot) {
 
-        try {
-            newX = Integer.parseInt( mEditTextNewX.getText().toString() );
-        } catch( NumberFormatException e ) {}
+            }
 
-        try {
-            newY = Integer.parseInt( mEditTextNewY.getText().toString() );
-        } catch( NumberFormatException e ) {}
+            @Override
+            public void handleStringResponse(String s, Robot robot) {
 
-        try {
-            newYaw = Integer.parseInt( mEditTextNewYaw.getText().toString() );
-        } catch( NumberFormatException e ) {}
+            }
 
-        int flag = mCheckboxFlag.isChecked() ?
-                ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_ON
-                : ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_OFF;
-
-        mRobot.sendCommand( new ConfigureLocatorCommand( flag, newX, newY, newYaw ) );
-    }*/
-
-    @Override
-    public void handleResponse(DeviceResponse response, Robot robot) {
-    }
-
-    @Override
-    public void handleStringResponse(String stringResponse, Robot robot) {
-    }
-
-    @Override
-    public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
-        if( asyncMessage instanceof DeviceSensorAsyncMessage ) {
-            float positionX = ( (DeviceSensorAsyncMessage) asyncMessage ).getAsyncData().get( 0 ).getLocatorData().getPositionX();
-            positionAtX += positionX;
-            float positionY = ( (DeviceSensorAsyncMessage) asyncMessage ).getAsyncData().get( 0 ).getLocatorData().getPositionY();
-            float velocityX = ( (DeviceSensorAsyncMessage) asyncMessage ).getAsyncData().get( 0 ).getLocatorData().getVelocity().x;
-            float velocityY = ( (DeviceSensorAsyncMessage) asyncMessage ).getAsyncData().get( 0 ).getLocatorData().getVelocity().y;
-
-            positionXTextView.setText(positionX + "cm");
-            //mTextViewLocatorY.setText( positionY + "cm" );
-            //mTextViewLocatorVX.setText( velocityX + "cm/s" );
-            //mTextViewLocatorVY.setText( velocityY + "cm/s" );
-        }
+            @Override
+            public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
+                if (asyncMessage instanceof CollisionDetectedAsyncData) {
+                    mRobot.drive(180f, ROBOT_VELOCITY);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mRobot.stop();
+                    try {
+                        Thread.sleep(750);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mRobot.drive(270f, ROBOT_VELOCITY);
+                    try {
+                        Thread.sleep(750);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mRobot.stop();
+                    try {
+                        Thread.sleep(750);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mRobot.drive(180f, ROBOT_VELOCITY);
+                }
+            }
+        });
     }
 
     @Override
@@ -164,18 +191,18 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
         switch (type) {
             case Online: {
                 DualStackDiscoveryAgent.getInstance().stopDiscovery();
-
                 connectTextBox.setText("Connected!");
+                testDriveForwardButton.setEnabled(true);
+                testDriveForwardButton.setBackgroundColor(Color.BLUE);
                 //Sensor flags can be bitwise ORed together to enable multiple sensors
                 long sensorFlag = SensorFlag.VELOCITY.longValue() | SensorFlag.LOCATOR.longValue();
-
                 //Save the robot as a ConvenienceRobot for additional utility methods
                 mRobot = new ConvenienceRobot(robot);
-
+                mRobot.setZeroHeading();
                 //Enable sensors based on earlier defined flags, and set the streaming rate.
                 //This example streams data from the connected robot 10 times a second.
-                mRobot.enableSensors( sensorFlag, SensorControl.StreamingRate.STREAMING_RATE100 );
-                mRobot.addResponseListener( this );
+                mRobot.enableSensors( sensorFlag, SensorControl.StreamingRate.STREAMING_RATE100);
+                //mRobot.addResponseListener( this );
 
                 break;
             }
