@@ -31,7 +31,7 @@ import com.orbotix.subsystem.SensorControl;
  */
 public class HomeScreen extends Activity implements RobotChangedStateListener {
 
-    private static final float ROBOT_VELOCITY = 0.4f;
+    private static final float ROBOT_VELOCITY = 0.3f;
 
     private ConvenienceRobot mRobot;
     public float positionAtY;
@@ -138,10 +138,59 @@ public class HomeScreen extends Activity implements RobotChangedStateListener {
 
     public void onAutoDriveButtonClicked (View view)
     {
+        driveFunction();
+
+
+
+        /*mRobot.addResponseListener(new ResponseListener() {
+            @Override
+            public void handleResponse(DeviceResponse deviceResponse, Robot robot) {
+
+            }
+
+            @Override
+            public void handleStringResponse(String s, Robot robot) {
+
+            }
+
+            @Override
+            public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
+                if (asyncMessage instanceof CollisionDetectedAsyncData) {
+                    mRobot.drive(180f, ROBOT_VELOCITY);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mRobot.stop();
+                    try {
+                        Thread.sleep(750);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mRobot.drive(270f, ROBOT_VELOCITY);
+                    try {
+                        Thread.sleep(750);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mRobot.stop();
+                    try {
+                        Thread.sleep(750);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                driveFunction();
+            }
+        });*/
+    }
+
+    public void driveFunction() //WHY THE FLUFF CANT WE READ THE COLLISION CORRECTLY?!
+    {
         mRobot.enableCollisions(true);
         mRobot.drive(0f, ROBOT_VELOCITY);
-
-
         mRobot.addResponseListener(new ResponseListener() {
             @Override
             public void handleResponse(DeviceResponse deviceResponse, Robot robot) {
@@ -180,8 +229,9 @@ public class HomeScreen extends Activity implements RobotChangedStateListener {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    mRobot.drive(180f, ROBOT_VELOCITY);
+
                 }
+                driveFunction();
             }
         });
     }
@@ -201,7 +251,7 @@ public class HomeScreen extends Activity implements RobotChangedStateListener {
                 mRobot.setZeroHeading();
                 //Enable sensors based on earlier defined flags, and set the streaming rate.
                 //This example streams data from the connected robot 10 times a second.
-                mRobot.enableSensors( sensorFlag, SensorControl.StreamingRate.STREAMING_RATE100);
+                mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE100);
                 //mRobot.addResponseListener( this );
 
                 break;
