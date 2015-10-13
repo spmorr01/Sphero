@@ -11,12 +11,14 @@ import com.orbotix.ConvenienceRobot;
 import com.orbotix.DualStackDiscoveryAgent;
 import com.orbotix.async.CollisionDetectedAsyncData;
 import com.orbotix.async.DeviceSensorAsyncMessage;
+import com.orbotix.command.RollCommand;
 import com.orbotix.common.DiscoveryException;
 import com.orbotix.common.ResponseListener;
 import com.orbotix.common.Robot;
 import com.orbotix.common.RobotChangedStateListener;
 import com.orbotix.common.internal.AsyncMessage;
 import com.orbotix.common.internal.DeviceResponse;
+import com.orbotix.common.sensor.DeviceSensorsData;
 import com.orbotix.common.sensor.SensorFlag;
 import com.orbotix.subsystem.SensorControl;
 
@@ -29,14 +31,15 @@ import com.orbotix.subsystem.SensorControl;
  * For more explanation on driving, see the Button Drive sample
  *
  */
-public class HomeScreen extends Activity implements RobotChangedStateListener {
+public class HomeScreen extends Activity implements RobotChangedStateListener, ResponseListener {
 
-    private static final float ROBOT_VELOCITY = 0.3f;
+    private static final float ROBOT_VELOCITY = 0.4f;
 
     private ConvenienceRobot mRobot;
     public float positionAtY;
     public boolean reachedDistance;
     public float driveVariable;
+    CollisionDetectedAsyncData message;
 
     TextView connectTextBox;
     TextView statusTextView;
@@ -111,7 +114,7 @@ public class HomeScreen extends Activity implements RobotChangedStateListener {
         statusTextView.setText("Rolling...");
         mRobot.drive(0f, ROBOT_VELOCITY);
 
-        mRobot.addResponseListener(new ResponseListener() {
+        /*mRobot.addResponseListener(new ResponseListener() {
             @Override
             public void handleResponse(DeviceResponse response, Robot robot) {
             }
@@ -133,64 +136,56 @@ public class HomeScreen extends Activity implements RobotChangedStateListener {
                     }
                 }
             }
-        });
+        }); */
+    }
+
+
+    public void cleanup() {
+        mRobot.removeResponseListener(this);
+        mRobot = null;
+    }
+
+    @Override
+    public void handleResponse(DeviceResponse response, Robot robot) {
+        // Do something with the response here
+    }
+
+    @Override
+    public void handleStringResponse(String stringResponse, Robot robot) {
+        // Handle string responses from the robot here
+    }
+
+    @Override
+    public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
+        if (asyncMessage instanceof CollisionDetectedAsyncData) {
+            //message = (CollisionDetectedAsyncData) asyncMessage;
+                collisionResponseFunction();
+            return;
+        }
+
     }
 
     public void onAutoDriveButtonClicked (View view)
     {
+        beginAutoDriveFunction();
+    }
+
+    public void beginAutoDriveFunction()
+    {
         driveFunction();
-
-
-
-        /*mRobot.addResponseListener(new ResponseListener() {
-            @Override
-            public void handleResponse(DeviceResponse deviceResponse, Robot robot) {
-
-            }
-
-            @Override
-            public void handleStringResponse(String s, Robot robot) {
-
-            }
-
-            @Override
-            public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
-                if (asyncMessage instanceof CollisionDetectedAsyncData) {
-                    mRobot.drive(180f, ROBOT_VELOCITY);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    mRobot.stop();
-                    try {
-                        Thread.sleep(750);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    mRobot.drive(270f, ROBOT_VELOCITY);
-                    try {
-                        Thread.sleep(750);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    mRobot.stop();
-                    try {
-                        Thread.sleep(750);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                driveFunction();
-            }
-        });*/
     }
 
     public void driveFunction() //WHY THE FLUFF CANT WE READ THE COLLISION CORRECTLY?!
     {
-        mRobot.enableCollisions(true);
         mRobot.drive(0f, ROBOT_VELOCITY);
+        mRobot.enableCollisions(true);
+        //collisionListenerFunction();
+
+
+    }
+
+    /*public void collisionListenerFunction()
+    {
         mRobot.addResponseListener(new ResponseListener() {
             @Override
             public void handleResponse(DeviceResponse deviceResponse, Robot robot) {
@@ -205,36 +200,39 @@ public class HomeScreen extends Activity implements RobotChangedStateListener {
             @Override
             public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
                 if (asyncMessage instanceof CollisionDetectedAsyncData) {
-                    mRobot.drive(180f, ROBOT_VELOCITY);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    mRobot.stop();
-                    try {
-                        Thread.sleep(750);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    mRobot.drive(270f, ROBOT_VELOCITY);
-                    try {
-                        Thread.sleep(750);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    mRobot.stop();
-                    try {
-                        Thread.sleep(750);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
+                    collisionResponseFunction();
                 }
-                driveFunction();
+                //driveFunction();
             }
         });
+    }*/
+
+    public void collisionResponseFunction()
+    {
+        mRobot.drive(180f, ROBOT_VELOCITY);
+        return;
+        //beginAutoDriveFunction();
+        /*try {
+            Thread.sleep(750);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mRobot.sendCommand(new RollCommand(0f, 0.0f, RollCommand.State.STOP));
+        try {
+            Thread.sleep(750);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mRobot.drive(270f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(750);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mRobot.sendCommand(new RollCommand(0f, 0.0f, RollCommand.State.STOP));
+        message = null;*/
     }
+
 
     @Override
     public void handleRobotChangedState(Robot robot, RobotChangedStateNotificationType type) {
@@ -248,10 +246,11 @@ public class HomeScreen extends Activity implements RobotChangedStateListener {
                 long sensorFlag = SensorFlag.VELOCITY.longValue() | SensorFlag.LOCATOR.longValue();
                 //Save the robot as a ConvenienceRobot for additional utility methods
                 mRobot = new ConvenienceRobot(robot);
+                mRobot.addResponseListener(this);
                 mRobot.setZeroHeading();
                 //Enable sensors based on earlier defined flags, and set the streaming rate.
                 //This example streams data from the connected robot 10 times a second.
-                mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE100);
+                mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE50);
                 //mRobot.addResponseListener( this );
 
                 break;
