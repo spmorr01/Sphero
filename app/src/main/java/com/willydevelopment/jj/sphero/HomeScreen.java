@@ -11,6 +11,7 @@ import com.orbotix.ConvenienceRobot;
 import com.orbotix.DualStackDiscoveryAgent;
 import com.orbotix.async.CollisionDetectedAsyncData;
 import com.orbotix.async.DeviceSensorAsyncMessage;
+import com.orbotix.command.ConfigureCollisionDetectionCommand;
 import com.orbotix.command.RollCommand;
 import com.orbotix.common.DiscoveryException;
 import com.orbotix.common.ResponseListener;
@@ -18,9 +19,11 @@ import com.orbotix.common.Robot;
 import com.orbotix.common.RobotChangedStateListener;
 import com.orbotix.common.internal.AsyncMessage;
 import com.orbotix.common.internal.DeviceResponse;
+import com.orbotix.common.internal.RobotVersion;
 import com.orbotix.common.sensor.DeviceSensorsData;
 import com.orbotix.common.sensor.SensorFlag;
 import com.orbotix.subsystem.SensorControl;
+
 
 /**
  * Locator sample
@@ -31,20 +34,25 @@ import com.orbotix.subsystem.SensorControl;
  * For more explanation on driving, see the Button Drive sample
  *
  */
-public class HomeScreen extends Activity implements RobotChangedStateListener, ResponseListener {
+public class HomeScreen extends Activity implements RobotChangedStateListener{
 
     private static final float ROBOT_VELOCITY = 0.4f;
+    private static final int STARTUP_ACTIVITY_RESULTS = 0;
 
     private ConvenienceRobot mRobot;
-    public float positionAtY;
+    public boolean robotShouldRespond;
+    public boolean collisionOccurred;
+    //public float positionY;
     public boolean reachedDistance;
     public float driveVariable;
-    CollisionDetectedAsyncData message;
+
 
     TextView connectTextBox;
     TextView statusTextView;
     TextView positionYTextView;
-    Button testDriveForwardButton;
+    TextView positionXTextView;
+    Button course1Button;
+    Button course2Button;
 
 
     @Override
@@ -54,8 +62,11 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
         connectTextBox = (TextView)findViewById(R.id.connectTextView);
         statusTextView = (TextView)findViewById(R.id.statusTextView);
         positionYTextView = (TextView)findViewById(R.id.positionYTextView);
-        testDriveForwardButton = (Button)findViewById(R.id.TestDriveForwardButton);
-        testDriveForwardButton.setEnabled(false);
+        positionXTextView = (TextView)findViewById(R.id.positionXTextView);
+        course1Button = (Button)findViewById(R.id.course1Button);
+        course1Button.setEnabled(false);
+        course2Button = (Button)findViewById(R.id.course2Button);
+        course2Button.setEnabled(false);
 
 
         /*
@@ -79,24 +90,18 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
         } catch( DiscoveryException e ) {
             //handle exception
         }
-    }
 
-    /*@Override
-    protected void onStop() {
-        if( mRobot != null )
-            mRobot.disconnect();
-        super.onStop();
-    }*/
+    }
 
     @Override
     protected void onStop() {
         //If the DiscoveryAgent is in discovery mode, stop it.
-        if( DualStackDiscoveryAgent.getInstance().isDiscovering() ) {
+        if (DualStackDiscoveryAgent.getInstance().isDiscovering()) {
             DualStackDiscoveryAgent.getInstance().stopDiscovery();
         }
 
         //If a robot is connected to the device, disconnect it
-        if( mRobot != null ) {
+        if (mRobot != null) {
             mRobot.disconnect();
             mRobot = null;
         }
@@ -110,9 +115,10 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
         DualStackDiscoveryAgent.getInstance().addRobotStateListener(null);
     }
 
-    public void onTestDriveForwardButtonClicked (View v) {
-        statusTextView.setText("Rolling...");
-        mRobot.drive(0f, ROBOT_VELOCITY);
+    public void onCourse1ButtonClicked (View v) {
+        course1Function();
+
+
 
         /*mRobot.addResponseListener(new ResponseListener() {
             @Override
@@ -129,63 +135,33 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
                     float positionY = ((DeviceSensorAsyncMessage) asyncMessage).getAsyncData().get(0).getLocatorData().getPositionY();
                     positionYTextView.setText(positionY + "cm");
 
+
                     if (positionY == 300) {
-                        mRobot.stop();
-                        testDriveForwardButton.setEnabled(false);
-                        statusTextView.setText("FINISHED!");
+                        reachedDistance = true;
+
                     }
+                    /*do {
+                        mRobot.drive(0f, ROBOT_VELOCITY);
+                    } while (positionY <= 1000);
+                    mRobot.stop();
+                    statusTextView.setText("FINISHED!");
                 }
             }
-        }); */
+        });*/
     }
 
 
-    public void cleanup() {
+    /*public void cleanup() {
         mRobot.removeResponseListener(this);
         mRobot = null;
-    }
+    }*/
 
-    @Override
-    public void handleResponse(DeviceResponse response, Robot robot) {
-        // Do something with the response here
-    }
 
-    @Override
-    public void handleStringResponse(String stringResponse, Robot robot) {
-        // Handle string responses from the robot here
-    }
 
-    @Override
-    public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
-        if (asyncMessage instanceof CollisionDetectedAsyncData) {
-            //message = (CollisionDetectedAsyncData) asyncMessage;
-                collisionResponseFunction();
-            return;
-        }
 
-    }
-
-    public void onAutoDriveButtonClicked (View view)
-    {
-        beginAutoDriveFunction();
-    }
-
-    public void beginAutoDriveFunction()
-    {
+    /*public void onAutoDriveButtonClicked (View view) {
         driveFunction();
-    }
-
-    public void driveFunction() //WHY THE FLUFF CANT WE READ THE COLLISION CORRECTLY?!
-    {
-        mRobot.drive(0f, ROBOT_VELOCITY);
-        mRobot.enableCollisions(true);
-        //collisionListenerFunction();
-
-
-    }
-
-    /*public void collisionListenerFunction()
-    {
+        mRobot.enableCollisions( true );
         mRobot.addResponseListener(new ResponseListener() {
             @Override
             public void handleResponse(DeviceResponse deviceResponse, Robot robot) {
@@ -200,59 +176,228 @@ public class HomeScreen extends Activity implements RobotChangedStateListener, R
             @Override
             public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
                 if (asyncMessage instanceof CollisionDetectedAsyncData) {
-                    collisionResponseFunction();
+                    collisionFunction();
                 }
-                //driveFunction();
             }
         });
     }*/
 
-    public void collisionResponseFunction()
+    public void onCourse2ButtonClicked(View v) {
+        course2function();
+    }
+
+    public void driveFunction() //WHY THE FLUFF CANT WE READ THE COLLISION CORRECTLY?!
     {
-        mRobot.drive(180f, ROBOT_VELOCITY);
-        return;
-        //beginAutoDriveFunction();
-        /*try {
-            Thread.sleep(750);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        mRobot.sendCommand(new RollCommand(0f, 0.0f, RollCommand.State.STOP));
+        mRobot.drive(0f, ROBOT_VELOCITY);
+        mRobot.enableCollisions(true);
+        //collisionListenerFunction();
+    }
+
+    public void course1Function() {
+        mRobot.drive(90f, ROBOT_VELOCITY);
         try {
-            Thread.sleep(750);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(1500);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(0f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(1500);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
         mRobot.drive(270f, ROBOT_VELOCITY);
         try {
-            Thread.sleep(750);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
-        mRobot.sendCommand(new RollCommand(0f, 0.0f, RollCommand.State.STOP));
-        message = null;*/
+        mRobot.stop();
+        try {
+            Thread.sleep(1500);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(180f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(1150);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(1500);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(270f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(1500);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(0f, 0f);
+        //course2function();
     }
 
+    public void course2function(){
+        mRobot.drive(45f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(315f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(1625);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(45f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(135f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(225f, 0.65f);
+        try {
+            Thread.sleep(2000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(0f, 0.65f);
+        try {
+            Thread.sleep(1625);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(135f, 0.65f);
+        try {
+            Thread.sleep(2000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(0f, 0.065f);
+        try {
+            Thread.sleep(1625);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(225f, 0.65f);
+        try {
+            Thread.sleep(2000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(90f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(1250);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(0f, 0f);
+        //course2function();
+    }
 
     @Override
     public void handleRobotChangedState(Robot robot, RobotChangedStateNotificationType type) {
         switch (type) {
             case Online: {
                 DualStackDiscoveryAgent.getInstance().stopDiscovery();
+                robotShouldRespond = false;
                 connectTextBox.setText("Connected!");
-                testDriveForwardButton.setEnabled(true);
-                testDriveForwardButton.setBackgroundColor(Color.BLUE);
-                //Sensor flags can be bitwise ORed together to enable multiple sensors
+                course1Button.setEnabled(true);
+                course1Button.setBackgroundColor(Color.BLUE);
+                course2Button.setEnabled(true);
+                course2Button.setBackgroundColor(Color.RED);
                 long sensorFlag = SensorFlag.VELOCITY.longValue() | SensorFlag.LOCATOR.longValue();
-                //Save the robot as a ConvenienceRobot for additional utility methods
                 mRobot = new ConvenienceRobot(robot);
-                mRobot.addResponseListener(this);
                 mRobot.setZeroHeading();
-                //Enable sensors based on earlier defined flags, and set the streaming rate.
-                //This example streams data from the connected robot 10 times a second.
-                mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE50);
-                //mRobot.addResponseListener( this );
-
+                mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE100);
                 break;
             }
         }

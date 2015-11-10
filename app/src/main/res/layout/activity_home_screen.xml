@@ -44,40 +44,53 @@
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
-            android:id="@+id/TestDriveRow"
+            android:id="@+id/positionXRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Position X"
+                android:id="@+id/positionXTextView"
+                android:gravity="center" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/course1Row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
             <Button
-                android:id="@+id/TestDriveForwardButton"
+                android:id="@+id/course1Button"
                 android:layout_width="125dp"
                 android:layout_height="75dp"
                 android:background="#24f0c9"
                 android:textSize="18sp"
-                android:text="Test Drive Forward"
+                android:text="Course 1"
                 android:textColor="#000000"
                 android:clickable="true"
                 android:layout_gravity="center"
-                android:onClick="onTestDriveForwardButtonClicked">
+                android:onClick="onCourse1ButtonClicked">
             </Button>
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
-            android:id="@+id/backwardsButtonRow"
+            android:id="@+id/course2Row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
             <Button
-                android:id="@+id/TestDriveBackwardsButton"
+                android:id="@+id/course2Button"
                 android:layout_width="125dp"
                 android:layout_height="75dp"
                 android:background="#ffffff"
                 android:textSize="18sp"
-                android:text="Test Drive Backwards"
+                android:text="Course 2"
                 android:textColor="#000000"
                 android:clickable="true"
                 android:layout_gravity="center"
-                android:onClick="onTestDriveBackwardsButtonClicked">
+                android:onClick="onCourse2ButtonClicked">
             </Button>
         </LinearLayout>
         <LinearLayout
