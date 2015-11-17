@@ -1,10 +1,16 @@
 package com.willydevelopment.jj.sphero;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.shapes.Shape;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.orbotix.ConvenienceRobot;
@@ -45,12 +51,15 @@ public class HomeScreen extends Activity implements RobotChangedStateListener{
     //public float positionY;
     public boolean reachedDistance;
     public float driveVariable;
+    private int loopCount;
+    private int distance;
 
 
     TextView connectTextBox;
     TextView statusTextView;
     TextView positionYTextView;
     TextView positionXTextView;
+    EditText distanceEditText;
     Button course1Button;
     Button course2Button;
 
@@ -63,6 +72,7 @@ public class HomeScreen extends Activity implements RobotChangedStateListener{
         statusTextView = (TextView)findViewById(R.id.statusTextView);
         positionYTextView = (TextView)findViewById(R.id.positionYTextView);
         positionXTextView = (TextView)findViewById(R.id.positionXTextView);
+        distanceEditText = (EditText)findViewById(R.id.distanceEditText);
         course1Button = (Button)findViewById(R.id.course1Button);
         course1Button.setEnabled(false);
         course2Button = (Button)findViewById(R.id.course2Button);
@@ -183,83 +193,69 @@ public class HomeScreen extends Activity implements RobotChangedStateListener{
     }*/
 
     public void onCourse2ButtonClicked(View v) {
-        course2function();
+        course2Function();
     }
 
-    public void driveFunction() //WHY THE FLUFF CANT WE READ THE COLLISION CORRECTLY?!
-    {
-        mRobot.drive(0f, ROBOT_VELOCITY);
-        mRobot.enableCollisions(true);
-        //collisionListenerFunction();
+    public void onCourse3ButtonClicked(View v){
+        course3Function();
     }
 
-    public void course1Function() {
-        mRobot.drive(90f, ROBOT_VELOCITY);
-        try {
-            Thread.sleep(1000);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.stop();
-        try {
-            Thread.sleep(1500);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
+    public void onCourse4ButtonClicked(View v){
+        course4Function();
+    }
+
+    public void onCourse5ButtonClicked(View v){
+        course5Function();
+    }
+
+    public void course1Function(){
         mRobot.drive(0f, ROBOT_VELOCITY);
         try {
-            Thread.sleep(1000);                 //1000 milliseconds is one second.
+            Thread.sleep(1500);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         mRobot.stop();
         try {
-            Thread.sleep(1500);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.drive(270f, ROBOT_VELOCITY);
-        try {
             Thread.sleep(1000);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.stop();
-        try {
-            Thread.sleep(1500);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         mRobot.drive(180f, ROBOT_VELOCITY);
         try {
-            Thread.sleep(1150);                 //1000 milliseconds is one second.
+            Thread.sleep(1500);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         mRobot.stop();
         try {
-            Thread.sleep(1500);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(0f, 0f);
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         mRobot.drive(270f, ROBOT_VELOCITY);
         try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         mRobot.stop();
         try {
-            Thread.sleep(1500);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        mRobot.drive(0f, 0f);
-        //course2function();
+        course2Function();
     }
 
-    public void course2function(){
-        mRobot.drive(45f, ROBOT_VELOCITY);
+    public void course2Function(){
+        mRobot.drive(0f, ROBOT_VELOCITY);
         try {
             Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
@@ -267,23 +263,11 @@ public class HomeScreen extends Activity implements RobotChangedStateListener{
         }
         mRobot.stop();
         try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        mRobot.drive(315f, ROBOT_VELOCITY);
-        try {
-            Thread.sleep(1625);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.stop();
-        try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.drive(45f, ROBOT_VELOCITY);
+        mRobot.drive(270f, ROBOT_VELOCITY);
         try {
             Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
@@ -291,11 +275,11 @@ public class HomeScreen extends Activity implements RobotChangedStateListener{
         }
         mRobot.stop();
         try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        mRobot.drive(135f, ROBOT_VELOCITY);
+        mRobot.drive(180f, ROBOT_VELOCITY);
         try {
             Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
@@ -303,85 +287,358 @@ public class HomeScreen extends Activity implements RobotChangedStateListener{
         }
         mRobot.stop();
         try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.drive(225f, 0.65f);
-        try {
-            Thread.sleep(2000);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.stop();
-        try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.drive(0f, 0.65f);
-        try {
-            Thread.sleep(1625);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.stop();
-        try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.drive(135f, 0.65f);
-        try {
-            Thread.sleep(2000);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.stop();
-        try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.drive(0f, 0.065f);
-        try {
-            Thread.sleep(1625);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.stop();
-        try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.drive(225f, 0.65f);
-        try {
-            Thread.sleep(2000);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        mRobot.stop();
-        try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         mRobot.drive(90f, ROBOT_VELOCITY);
         try {
-            Thread.sleep(1250);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         mRobot.stop();
         try {
-            Thread.sleep(750);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         mRobot.drive(0f, 0f);
-        //course2function();
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(270f, 1.0f);
+        try {
+            Thread.sleep(2000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.stop();
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        course3Function();
     }
+
+    public void course3Function() {
+        loopCount = 1;
+        mRobot.drive(90f, ROBOT_VELOCITY);
+        try {
+            Thread.sleep(750);                 //1000 milliseconds is one second.
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        do {
+            mRobot.drive(90f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(80f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(70f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(60f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(50f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(40f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(30f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(20f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(10f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(0f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(350f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(340f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(330f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(320f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(310f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(300f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(290f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(280f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(270f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(260f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(250f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(240f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(230f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(220f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(210f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(200f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(190f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(180f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(170f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(160f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(150f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(140f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(130f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(120f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(110f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mRobot.drive(100f, ROBOT_VELOCITY);
+            try {
+                Thread.sleep(250);                 //1000 milliseconds is one second.
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            loopCount += 1;
+        } while (loopCount <= 3);
+        mRobot.stop();
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        mRobot.drive(0f, 0f);
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        course4Function();
+    }
+
+    public void course4Function(){
+        mRobot.drive(0f, ROBOT_VELOCITY);
+        mRobot.enableCollisions(true);
+        mRobot.addResponseListener(new ResponseListener() {
+            @Override
+            public void handleResponse(DeviceResponse deviceResponse, Robot robot) {
+
+            }
+
+            @Override
+            public void handleStringResponse(String s, Robot robot) {
+
+            }
+
+            @Override
+            public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
+                if (asyncMessage instanceof CollisionDetectedAsyncData) {
+                    mRobot.stop();
+                    mRobot.setLed(1.0f, 0f, 0f);
+                }
+            }
+        });
+    }
+
+    public void course5Function(){
+        int errorCount = 0;
+        try {
+            distance = Integer.parseInt(distanceEditText.getText().toString());
+        } catch (Exception e){
+            errorCount += 1;
+            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+            dlgAlert.setMessage("Please enter a valid numeric value.");
+            dlgAlert.setTitle("Error: Invalid Integer");
+            dlgAlert.setPositiveButton("OK", null);
+            dlgAlert.setCancelable(true);
+            dlgAlert.create().show();
+
+            dlgAlert.setPositiveButton("Ok",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+        }
+        if (errorCount == 0){
+            mRobot.drive(0f, ROBOT_VELOCITY);
+            mRobot.addResponseListener(new ResponseListener() {
+                @Override
+                public void handleResponse(DeviceResponse response, Robot robot) {
+                }
+
+                @Override
+                public void handleStringResponse(String stringResponse, Robot robot) {
+                }
+
+                @Override
+                public void handleAsyncMessage(AsyncMessage asyncMessage, Robot robot) {
+                    if (asyncMessage instanceof DeviceSensorAsyncMessage) {
+                        float positionY = ((DeviceSensorAsyncMessage) asyncMessage).getAsyncData().get(0).getLocatorData().getPositionY();
+                        positionYTextView.setText(positionY + "cm");
+
+                        if (positionY == distance) {
+                            mRobot.stop();
+                            mRobot.setLed(0f, 1.0f, 0f);
+                        }
+
+                    //statusTextView.setText("FINISHED!");
+                }
+            }
+        });
+        }
+    }
+
 
     @Override
     public void handleRobotChangedState(Robot robot, RobotChangedStateNotificationType type) {
@@ -400,6 +657,10 @@ public class HomeScreen extends Activity implements RobotChangedStateListener{
                 mRobot.enableSensors(sensorFlag, SensorControl.StreamingRate.STREAMING_RATE100);
                 break;
             }
+            case Offline: {
+                connectTextBox.setText("Disconnected...");
+            }
         }
     }
+
 }

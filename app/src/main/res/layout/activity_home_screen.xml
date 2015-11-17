@@ -95,41 +95,73 @@
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
-            android:id="@+id/SquareDriveButtonRow"
+            android:id="@+id/course3Row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
             <Button
-                android:id="@+id/SquareDriveButton"
+                android:id="@+id/course3Button"
                 android:layout_width="125dp"
                 android:layout_height="75dp"
                 android:background="#ffffff"
                 android:textSize="18sp"
-                android:text="Square"
+                android:text="Course 3"
                 android:textColor="#000000"
                 android:clickable="true"
                 android:layout_gravity="center"
-                android:onClick="onSquareDriveButtonClicked">
+                android:onClick="onCourse3ButtonClicked">
             </Button>
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
-            android:id="@+id/AutoDriveButtonRow"
+            android:id="@+id/course4Row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
             <Button
-                android:id="@+id/AutoDriveButton"
+                android:id="@+id/course4Button"
                 android:layout_width="125dp"
                 android:layout_height="75dp"
                 android:background="#ffffff"
                 android:textSize="18sp"
-                android:text="Auto Drive"
+                android:text="Course 4"
                 android:textColor="#000000"
                 android:clickable="true"
                 android:layout_gravity="center"
-                android:onClick="onAutoDriveButtonClicked">
+                android:onClick="onCourse4ButtonClicked">
             </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/course5Row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <Button
+                android:id="@+id/course5Button"
+                android:layout_width="125dp"
+                android:layout_height="75dp"
+                android:background="#ffffff"
+                android:textSize="18sp"
+                android:text="Course 5"
+                android:textColor="#000000"
+                android:clickable="true"
+                android:layout_gravity="center"
+                android:onClick="onCourse5ButtonClicked">
+            </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/editTextRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="(Distance in cm)"
+                android:id="@+id/distanceEditText"
+                android:gravity="center" />
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
